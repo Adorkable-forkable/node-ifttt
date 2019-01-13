@@ -146,7 +146,7 @@ Ifttt.prototype.addExpressRoutes = function(app) {
 
     that.generateTestSetupSample(function(samples){
       var setupResponse = {
-        accessToken: that.iftttTestAccessToken,
+        accessToken: that.iftttTestAccessToken.length > 0 ? that.iftttTestAccessToken : undefined,
         samples: samples
       };
 

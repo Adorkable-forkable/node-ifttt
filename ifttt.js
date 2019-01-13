@@ -47,7 +47,7 @@ function Ifttt(config) {
   this.iftttTestAccessToken = config.testAccessToken;
 
   // Internal reference to desired logger.
-  this.logger = config.logger; // Must support `info`, `error`, `warn`
+  this.logger = config.logger; // Must support `log`, `info`, `error`, `warn`
 
   // Internal registry for actions & triggers.
   this.registry = {

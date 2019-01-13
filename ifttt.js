@@ -463,13 +463,14 @@ Ifttt.prototype.generateTestSetupSample = function(cb) {
 
       _.each(fields, function(field){
         var sampleData = field.getOptionsSampleData();
+        
         if (!_.isUndefined(sampleData.valid)) {
           samples.actions[action.getSlug()][field.getSlug()] = sampleData.valid;
         }
 
         if (field.isRequired()) {
           samples.actionRecordSkipping[action.getSlug()] = samples.actionRecordSkipping[action.getSlug()] || {};
-          samples.actionRecordSkipping[action.getSlug()][field.getSlug()] = '';
+          samples.actionRecordSkipping[action.getSlug()][field.getSlug()] = sampleData.invalid;
         }
       });
     }

@@ -13,7 +13,7 @@ var TRIGGER_RESOURCE = 'trigger';
  * @param config
  * @param config.apiVersion
  * @param config.authMode
- * @param config.channelKey
+ * @param config.serviceKey
  * @param config.logger
  * @param config.testAccessToken
  *
@@ -28,14 +28,14 @@ function Ifttt(config) {
     testAccessToken: ''
   });
 
-  if (_.isUndefined(config.channelKey)) {
-    throw new Error('Property `channelKey` is required.');
+  if (_.isUndefined(config.serviceKey)) {
+    throw new Error('Property `serviceKey` is required.');
   }
 
   this.iftttApiVersion = config.apiVersion;
 
-  // IFTTT channel key, needed for test setup verification.
-  this.iftttChannelKey = config.channelKey;
+  // IFTTT service key, needed for test setup verification.
+  this.iftttServiceKey = config.serviceKey;
 
   // IFTTT version basepath
   this.iftttBasepath = '/ifttt/' + this.iftttApiVersion;
@@ -80,13 +80,13 @@ Ifttt.prototype.addExpressRoutes = function(app) {
   };
 
   /**
-   * Implements IFTTT Channel status:
+   * Implements IFTTT Service status:
    *
    * Provide an API endpoint which IFTTT can periodically check for your
-   * channel’s availability. This endpoint is not user-specific, and thus does
+   * service’s availability. This endpoint is not user-specific, and thus does
    * not require an access token.
    *
-   * @see https://developers.ifttt.com/docs/api_reference#channel-status
+   * @see https://developers.ifttt.com/docs/api_reference#service-status
    */
   app.get(this.iftttBasepath + '/status', headerCheck, function(req, res){
     if (!_.isFunction(that.handlers.status)) {
@@ -108,7 +108,7 @@ Ifttt.prototype.addExpressRoutes = function(app) {
    *
    * After acquiring an access token, IFTTT will make a request to your user
    * information endpoint. This information is considered private, and will only
-   * be displayed to the user who activated your channel. Occasionally, IFTTT
+   * be displayed to the user who activated your service. Occasionally, IFTTT
    * will make requests to this endpoint to verify that the user’s access token
    * is still valid.
    *
@@ -129,19 +129,19 @@ Ifttt.prototype.addExpressRoutes = function(app) {
    * Implements IFTTT Test setup:
    *
    * Before starting an automated test, the endpoint testing tool will send a
-   * POST request to your channel API’s test/setup endpoint. This serves as a
+   * POST request to your service API’s test/setup endpoint. This serves as a
    * signal to your API that a test is about to begin.
    *
-   * For security, the endpoint testing tool will send your Channel Key in the
+   * For security, the endpoint testing tool will send your Service Key in the
    * request to test/setup as a bearer token. Before performing any of the
    * above operations, you should verify that the value of the bearer token
-   * matches the value for your Channel Key, as displayed in the Developer UI.
+   * matches the value for your Service Key, as displayed in the Developer UI.
    *
    * @see https://developers.ifttt.com/docs/testing#the-testsetup-endpoint
    */
   app.post(this.iftttBasepath + '/test/setup', headerCheck, function(req, res){
-    if (req.get('IFTTT-Channel-Key') !== that.iftttChannelKey) {
-      return res.status(401).send( JSON.stringify({errors:[{message:'Unauthorized request since an invalid channelkey was given'}]}) );
+    if (req.get('IFTTT-Service-Key') !== that.iftttServiceKey) {
+      return res.status(401).send( JSON.stringify({errors:[{message:'Unauthorized request since an invalid service key was given'}]}) );
     }
 
     that.generateTestSetupSample(function(samples){
@@ -248,9 +248,9 @@ Ifttt.prototype.accessCheck = function(req, res, next, options) {
   // Either we run auth mode 'header' and we check the header for each request,
   // or we force this header check for specific endpoints (status, test/setup).
   if (this.iftttAuthMode === 'header' || options.forceHeaderCheck) {
-    if (req.get('IFTTT-Channel-Key') !== this.iftttChannelKey) {
-      this.logger.warn('Invalid IFTTT-Channel-Key header.');
-      return res.status(401).send( JSON.stringify({errors:[{message:'Unauthorized because of invalid channel key'}]}) );
+    if (req.get('IFTTT-Service-Key') !== this.iftttServiceKey) {
+      this.logger.warn('Invalid IFTTT-Service-Key header.');
+      return res.status(401).send( JSON.stringify({errors:[{message:'Unauthorized because of invalid service key'}]}) );
     }
   }
 

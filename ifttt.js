@@ -328,6 +328,16 @@ Ifttt.prototype._registerResource = function(type, resource) {
 };
 
 /**
+ * Unregisters a resource.
+ *
+ * @param type
+ * @param resource
+ */
+Ifttt.prototype._unregisterResource = function(type, resource) {
+  this.registry[type][resource.getSlug()] = undefined;
+};
+
+/**
  * Returns all resources of given type.
  *
  * @param type
@@ -486,6 +496,10 @@ Ifttt.prototype.registerAction = function(action) {
   this._registerResource(ACTION_RESOURCE, action);
 };
 
+Ifttt.prototype.unregisterAction = function(action) {
+  this._unregisterResource(ACTION_RESOURCE, action);
+};
+
 Ifttt.prototype.getActions = function() {
   return this._getResources(ACTION_RESOURCE);
 };
@@ -509,6 +523,10 @@ Ifttt.Action = ActionResource;
  */
 Ifttt.prototype.registerTrigger = function(trigger) {
   this._registerResource(TRIGGER_RESOURCE, trigger);
+};
+
+Ifttt.prototype.unregisterTrigger = function(trigger) {
+  this._unregisterResource(TRIGGER_RESOURCE, trigger);
 };
 
 Ifttt.prototype.getTriggers = function() {
